@@ -1,6 +1,5 @@
 #include <ros.h>
 #include <rospy_tutorials/Floats.h>
-//#include <three_dof_planar_manipulator/Floats_array.h>
 #include <ESP32Servo.h> 
 #include <Wire.h>
 
@@ -8,7 +7,8 @@
 #define slave2 10
 ros::NodeHandle  nh;
 
-long int oldmillis ;
+
+
 
 void servo_cb( const rospy_tutorials::Floats& cmd_msg){
   //nh.loginfo("Command Received ");
@@ -16,11 +16,6 @@ void servo_cb( const rospy_tutorials::Floats& cmd_msg){
   int new_pos[6]={cmd_msg.data[0],cmd_msg.data[1],cmd_msg.data[2],cmd_msg.data[3],cmd_msg.data[4],cmd_msg.data[5]};
   //int new_pos[3]={cmd_msg.data[0],cmd_msg.data[1],cmd_msg.data[2]};
   
-  if (millis()-oldmillis >1000)
-  {
-    Serial.print("pos 1 : ");
-    Serial.print(cmd_msg.data[0]);
-  }
   
   int i=0,j=0;
   uint8_t buffer[6]={0,0,0,0,0,0};
