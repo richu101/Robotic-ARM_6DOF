@@ -1,3 +1,6 @@
+#include <ros.h>
+#include <rospy_tutorials/Floats.h>
+#include <ESP32Servo.h> 
 #include <esp_now.h>
 #include <WiFi.h>
 
@@ -5,19 +8,41 @@ int int_val;
 float float_val;
 bool bool_val =  true;
 
+ros::NodeHandle  nh;
+
+
 // MAC address of the receiver 2
 // esp 2 E8:DB:84:17:3C:38   {0xE8, 0xDB, 0x84, 0x17, 0x3C, 0x38}
 // esp 1 C0:49:EF:FA:0D:BC   {0xC0, 0x49, 0xEF, 0xFA, 0x0D, 0xBC}
 
-uint8_t broadcastAddress[] = {0xC0, 0x49, 0xEF, 0xFA, 0x0D, 0xBC};
+uint8_t broadcastAddress[] = {0xC0, 0x49, 0xEF, 0xFA, 0x0D, 0xBC}; // esp 1 slave
 
 typedef struct struct_message {
-  int int_val;
-  float float_val;
-  bool bool_val;
+    int joint0;
+    int joint1;
+    int joint2;
+    int joint3;
+    int joint4;
+    int joint5;
+  
 } struct_message;
 
 struct_message myData;
+
+void servo_cb( const rospy_tutorials::Floats& cmd_msg){
+  //nh.loginfo("Command Received ");
+  
+  int new_pos[6]={cmd_msg.data[0],cmd_msg.data[1],cmd_msg.data[2],cmd_msg.data[3],cmd_msg.data[4],cmd_msg.data[5]};
+    myData.joint0 = new_pos[0];
+    myData.joint1 = new_pos[1];
+    myData.joint2 = new_pos[2];
+    myData.joint3 = new_pos[3];
+    myData.joint4 = new_pos[4];
+    myData.joint5 = new_pos[5];
+    send_data();
+}
+
+ros::Subscriber<rospy_tutorials::Floats> sub("/joints_to_aurdino",servo_cb);
  
  //peer information
  esp_now_peer_info_t slave1;
@@ -29,9 +54,21 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
   Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
 }
 
+void send_data() {
+  // Send message via ESP-NOW
+  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
+  if (result == ESP_OK) {
+    Serial.println("Sent with success");
+  } else {
+    Serial.println("Error sending the data");
+  }
+}
+
 void setup() {
   Serial.begin(115200);
   // Set device as a Wi-Fi Station
+  nh.initNode();
+
   WiFi.mode(WIFI_STA);
   // Init ESP-NOW
   if (esp_now_init() != ESP_OK) {
@@ -53,20 +90,8 @@ void setup() {
 }
 
 void loop() {
-    myData.int_val = int_val;
-    myData.float_val = float_val;
-    myData.bool_val = bool_val;
-  // send message via ESP-NOW
-  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
-  if (result == ESP_OK) {
-    Serial.println("Sent with success");
-  } else {
-    Serial.println("Error sending the data");
-  }
-  delay(1000);
-  int_val++;
-  float_val += 0.1;
-  bool_val = !bool_val;
+    
+    nh.spinOnce();
 }
 
 
