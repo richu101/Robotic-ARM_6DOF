@@ -1,15 +1,15 @@
 #include <ros.h>
-#include <rospy_tutorials/Floats.h>
+#include <std_msgs/Float32.h>
 #include <ESP32Servo.h> 
 #include <esp_now.h>
 #include <WiFi.h>
+typedef struct struct_message {
+  float fldata;
+} struct_message;
 
-int int_val;
-float float_val;
-bool bool_val =  true;
+struct_message myData;
 
 ros::NodeHandle  nh;
-
 
 // MAC address of the receiver 2
 // esp 2 E8:DB:84:17:3C:38   {0xE8, 0xDB, 0x84, 0x17, 0x3C, 0x38}
@@ -17,37 +17,19 @@ ros::NodeHandle  nh;
 
 uint8_t broadcastAddress[] = {0xC0, 0x49, 0xEF, 0xFA, 0x0D, 0xBC}; // esp 1 slave
 
-typedef struct struct_message {
-    float joint0;
-    float joint1;
-    float joint2;
-    float joint3;
-    float joint4;
-    float joint5;
-  
-} struct_message;
 
-struct_message myData;
 
-void servo_cb( const rospy_tutorials::Floats& cmd_msg){
-  //nh.loginfo("Command Received ");
+void messageCb( const std_msgs::Float32& float_msg){
+  myData.fldata = float_msg.data;
+  if (myData.fldata == 5)
+  {
+    digitalWrite(2, !digitalRead(2));
+  }
   
-  int new_pos[6]={cmd_msg.data[0],cmd_msg.data[1],cmd_msg.data[2],cmd_msg.data[3],cmd_msg.data[4],cmd_msg.data[5]};
-    myData.joint0 = new_pos[0];
-    myData.joint1 = new_pos[1];
-    myData.joint2 = new_pos[2];
-    myData.joint3 = new_pos[3];
-    myData.joint4 = new_pos[4];
-    myData.joint5 = new_pos[5];
-    send_data();
+  send_data();
 }
-
-ros::Subscriber<rospy_tutorials::Floats> sub("/joints_to_aurdino",servo_cb);
- 
- //peer information
- esp_now_peer_info_t slave1;
-
- // callback function that will be executed when data is sent 
+ros::Subscriber<std_msgs::Float32> sub("chatter", &messageCb );
+esp_now_peer_info_t slave1;
 
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
   Serial.print("Last Packet Send Status:\t");
@@ -64,11 +46,11 @@ void send_data() {
   }
 }
 
-void setup() {
-  Serial.begin(115200);
-  // Set device as a Wi-Fi Station
+void setup(){
   nh.initNode();
-  Serial.println("Setup");
+  nh.subscribe(sub);
+  Serial.begin(57600);
+  pinMode(2, OUTPUT);
   WiFi.mode(WIFI_STA);
   // Init ESP-NOW
   if (esp_now_init() != ESP_OK) {
@@ -88,7 +70,7 @@ void setup() {
     return;
   }
 }
-
-void loop() {
-    nh.spinOnce();
+void loop(){
+  nh.spinOnce();
+  delay(1);
 }
