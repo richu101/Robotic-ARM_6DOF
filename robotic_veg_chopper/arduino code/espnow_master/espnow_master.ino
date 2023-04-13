@@ -4,9 +4,7 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
-int int_val;
-float float_val;
-bool bool_val =  true;
+
 
 ros::NodeHandle  nh;
 
@@ -65,9 +63,12 @@ void send_data() {
 }
 
 void setup() {
-  Serial.begin(115200);
-  // Set device as a Wi-Fi Station
+
   nh.initNode();
+  nh.subscribe(sub);
+  Serial.begin(57600);
+  // Set device as a Wi-Fi Station
+  
   Serial.println("Setup");
   WiFi.mode(WIFI_STA);
   // Init ESP-NOW
@@ -91,4 +92,5 @@ void setup() {
 
 void loop() {
     nh.spinOnce();
+    delay(1);
 }

@@ -2,7 +2,13 @@
 #include <WiFi.h>
 
 typedef struct struct_message {
-  float fldata;
+    float joint0;
+    float joint1;
+    float joint2;
+    float joint3;
+    float joint4;
+    float joint5;
+  
 } struct_message;
 
 struct_message myData;
@@ -11,8 +17,18 @@ struct_message myData;
 
 void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
 memcpy(&myData, incomingData, sizeof(myData));
-Serial.print("Int value received: ");
-Serial.println(myData.fldata);
+Serial.print("Joint0 value received: ");
+Serial.println(myData.joint0);
+Serial.print("Joint1 value received: ");
+Serial.println(myData.joint1);
+Serial.print("Joint2 value received: ");
+Serial.println(myData.joint2);
+Serial.print("Joint3 value received: ");
+Serial.println(myData.joint3);
+Serial.print("Joint4 value received: ");
+Serial.println(myData.joint4);
+Serial.print("Joint5 value received: ");
+Serial.println(myData.joint5);
 }
 
 void setup() {
