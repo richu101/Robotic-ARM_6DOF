@@ -12,8 +12,15 @@ ros::NodeHandle  nh;
 // MAC address of the receiver 2
 // esp 2 E8:DB:84:17:3C:38   {0xE8, 0xDB, 0x84, 0x17, 0x3C, 0x38}
 // esp 1 C0:49:EF:FA:0D:BC   {0xC0, 0x49, 0xEF, 0xFA, 0x0D, 0xBC}
-
-uint8_t broadcastAddress[] = {0xC0, 0x49, 0xEF, 0xFA, 0x0D, 0xBC}; // esp 1 slave
+// esp 3 E8:68:E7:29:85:EC   {0xE8, 0x68, 0xE7, 0x29, 0x85, 0xEC}
+// esp 4 C8:F0:9E:F7:90:90   {0xC8, 0xF0, 0x9E, 0xF7, 0x90, 0x90}
+uint8_t broadcastAddress[] = {0xE8, 0x68, 0xE7, 0x29, 0x85, 0xEC}; // esp 3 slave
+// Serial.print("Joint3 value received: ");
+// Serial.println(myData.joint3);
+// Serial.print("Joint4 value received: ");
+// Serial.println(myData.joint4);
+// Serial.print("Joint5 value received: ");
+// Serial.println(myData.joint5);
 
 typedef struct struct_message {
     float joint0;
