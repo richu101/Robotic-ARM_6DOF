@@ -32,7 +32,7 @@ typedef struct struct_message {
   
 } struct_message;
 
-struct_message myData;
+struct_message myData ;
 
 void servo_cb( const rospy_tutorials::Floats& cmd_msg){
   //nh.loginfo("Command Received ");

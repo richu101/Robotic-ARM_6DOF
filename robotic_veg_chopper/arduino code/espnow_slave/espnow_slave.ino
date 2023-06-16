@@ -19,7 +19,12 @@ typedef struct struct_message {
 struct_message myData;
 
 
-// call back when data is received
+// call back when data is received// Serial.print("Joint3 value received: ");
+// Serial.println(myData.joint3);
+// Serial.print("Joint4 value received: ");
+// Serial.println(myData.joint4);
+// Serial.print("Joint5 value received: ");
+// Serial.println(myData.joint5);
 
 void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
 memcpy(&myData, incomingData, sizeof(myData));
